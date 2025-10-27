@@ -1,0 +1,162 @@
+//
+// Created by 郑荘霖 on 2025/7/3.
+//
+#define _STATISTICS_
+//#define _FIX_DIMENSION_
+
+#include <iostream>
+#include <getopt.h>
+#include <fstream>
+#include <ctime>
+#include <set>
+#include <cmath>
+#include <queue>
+#include "../../utils.h"
+#include "../../Logger/Logger.h"
+#include "../../FileIO/File_IO.h"
+
+using SearchKnnFuncPtr =
+std::priority_queue<std::pair<float, hnswlib::labeltype>>
+(hnswlib::HierarchicalNSW<float>::*)(const void *, size_t, hnswlib::BaseFilterFunctor *) const;
+
+SearchKnnFuncPtr knn_ptr = nullptr;
+
+
+int main(int argc, char *argv[]) {
+    printf("%zu\n", delta_d);
+    int K = 100;
+    std::string dataset_path = "/home/zzlin/dataset/glove100/Qglove100_base.fvecs";
+    std::string query_path = "/home/zzlin/dataset/glove100/query.fvecs";
+    std::string ground_truth_path = "/home/zzlin/dataset/glove100/gt_256.ivecs";
+    std::string index_path = "/home/zzlin/dataset/glove100/hnsw_Qglove100_M16_efConstruction500_operator0.index";
+    int op = 7;
+
+    std::cout << "K: " << K << std::endl;
+    std::cout << "dataset_path: " << dataset_path << std::endl;
+    std::cout << "query_path: " << query_path << std::endl;
+    std::cout << "ground_truth_path: " << ground_truth_path << std::endl;
+    std::cout << "index_path: " << index_path << std::endl;
+    std::cout << "operator: " << op << std::endl;
+
+#ifdef _FIX_DIMENSION_
+    if (init_d == 0) {
+        std::cout << "Error: dimension not init" << std::endl;
+        exit(1);
+    }
+    if (op == 0 || op == 7) {
+        std::cout << "Error: operator not support" << std::endl;
+        exit(1);
+    }
+#endif
+
+    //// read query and groundtruth
+    Logger logger;
+    std::vector<VectorDataType> query_list;
+    std::vector<size_t> query_k_list;
+    ReadVectorQuery(query_path, query_list, query_k_list);
+
+    std::vector<std::vector<VidType>> ground_truth;
+    ReadGroundTruth(ground_truth_path, ground_truth);
+
+    std::string msg = std::to_string(K);
+    if (op == 6 || op == 7 || op == 14 || op == 15 || op == 16) {
+        msg = "hnsw" + msg;
+        if (delta_d != 32) {
+            msg = "delta" + std::to_string(delta_d) + "_" + msg;
+        }
+    }
+
+    //// load index
+    int dim = query_list[0].Dimension();
+    hnswlib::L2Space space(dim);
+    hnswlib::HierarchicalNSW<float> *alg_hnsw = new hnswlib::HierarchicalNSW<float>(&space, index_path);
+    alg_hnsw->dist_compare_operator_ = setup_DCO(dataset_path, dim, op, msg);
+    knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnn;
+
+    //// search
+    std::vector<size_t> efs;
+    efs.push_back(100);
+    efs.push_back(K);
+    for (int i = 1; i <= 15; ++i) {
+        efs.push_back(i * 100);
+    }
+    if (op >= 2) {
+        for (auto &query: query_list) {
+            HPLogger hp_logger;
+            alg_hnsw->dist_compare_operator_->query_transform(query.data.data());
+            hp_logger.SetEndTimer();
+            alg_hnsw->dist_compare_operator_->add_rota_time(hp_logger.GetDurationTime());
+        }
+    }
+
+    if (op == 5) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnIP;
+        logger.SetStartTimer();
+        alg_hnsw->compute_base_square(false);
+        logger.SetEndTimer();
+        std::cout << "compute base square time: " << logger.GetDurationTime() << " [ms] " << std::endl;
+    }
+
+    if (op == 7) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnOPQ;
+        logger.SetStartTimer();
+        alg_hnsw->encoder_origin_data();
+        logger.SetEndTimer();
+        std::cout << "encoder origin data time: " << logger.GetDurationTime() << " [ms] " << std::endl;
+    }
+
+    if (op == 9 || op == 10 || op == 11 || op == 12 || op == 16) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnNorm;
+    }
+
+    if (op == 13) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnNormIP;
+        logger.SetStartTimer();
+        alg_hnsw->compute_base_product_mean(true);
+        logger.SetEndTimer();
+        std::cout << "compute base product mean time: " << logger.GetDurationTime() << " [ms] " << std::endl;
+    }
+
+    if (op == 15) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnOPQIP;
+        logger.SetStartTimer();
+        alg_hnsw->encoder_origin_data_ip();
+        logger.SetEndTimer();
+        std::cout << "ip encoder origin data time: " << logger.GetDurationTime() << " [ms] " << std::endl;
+    }
+
+    if (op == 17) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnOPQIP2;
+        logger.SetStartTimer();
+        alg_hnsw->encoder_origin_data_ip2();
+        logger.SetEndTimer();
+        std::cout << "ip2 encoder origin data time: " << logger.GetDurationTime() << " [ms] " << std::endl;
+    }
+
+//    alg_hnsw->dist_compare_operator_->cancel_SIMD();
+//    std::cout << "without SIMD" << std::endl;
+    HPLogger hp_logger;
+    for (auto ef : efs) {
+        alg_hnsw->setEf(ef);
+        double duration_time = 0;
+        std::vector<std::vector<VidType>> answer_list;
+        for (auto query: query_list) {
+            hp_logger.SetStartTimer();
+            std::vector<VidType> result;
+            std::priority_queue<std::pair<float, hnswlib::labeltype>> Result = (alg_hnsw->*knn_ptr)(query.data.data(), K, nullptr);
+            while (!Result.empty()) result.emplace_back(Result.top().second), Result.pop();
+            std::reverse(result.begin(), result.end());
+            answer_list.push_back(result);
+            hp_logger.SetEndTimer();
+            duration_time += hp_logger.GetDurationTime();
+            std::cout << "query" << query.vid << ": " << "search time = " << std::fixed << std::setprecision(6) << hp_logger.GetDurationTime() << " [ms] " << std::endl;
+        }
+        std::cout << "ef" << ef << ": "<< "search time = " << std::fixed << std::setprecision(6) << duration_time << " [ms] "<< " ";
+        EvaluateAnswer(answer_list, ground_truth, K);
+    }
+#ifdef _STATISTICS_
+    alg_hnsw->dist_compare_operator_->print_statistics();
+#endif
+    delete alg_hnsw;
+    return 0;
+}
