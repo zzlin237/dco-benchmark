@@ -67,6 +67,10 @@ add_executable(hnsw_update hnsw_update.cpp)
 target_link_libraries(hnsw_update FileIO Logger hnswlib)
 set_target_properties(hnsw_update PROPERTIES COMPILE_FLAGS "-O3")
 
+add_executable(hnsw_update_opq hnsw_update_opq.cpp)
+target_link_libraries(hnsw_update_opq FileIO Logger hnswlib)
+set_target_properties(hnsw_update_opq PROPERTIES COMPILE_FLAGS "-O3")
+
 add_executable(hnsw_update_ip hnsw_update_ip.cpp)
 target_link_libraries(hnsw_update_ip FileIO Logger hnswlib)
 set_target_properties(hnsw_update_ip PROPERTIES COMPILE_FLAGS "-O3")

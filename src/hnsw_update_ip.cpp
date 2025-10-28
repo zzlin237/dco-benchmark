@@ -151,38 +151,6 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        if (op == 7) {
-            knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnOPQ;
-            DDCopq * ddcopq = dynamic_cast<DDCopq *>(alg_hnsw->dist_compare_operator_.get());
-            ddcopq->pq_mp_.resize(data_list.size() * ddcopq->sub_vector_);
-            ddcopq->node_cluster_dist_.resize(data_list.size());
-            double ave_dist = 0.0;
-            for (int i = 0; i < data_list.size(); i++) {
-                float dist_to_centroid = 0.0;
-                for (int j = 0; j < ddcopq->sub_vector_; j++) {
-                    uint8_t belong = 0;
-                    float dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
-                                                       ddcopq->pq_book_[j][0].data(),
-                                                       ddcopq->dist_func_param_sub_);
-                    for (int k = 1; k < ddcopq->sub_cluster_count_; k++) {
-                        float new_dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
-                                                               ddcopq->pq_book_[j][k].data(),
-                                                               ddcopq->dist_func_param_sub_);
-                        if (new_dist < dist) {
-                            belong = k;
-                            dist = new_dist;
-                        }
-                    }
-                    dist_to_centroid += dist;
-                    ddcopq->pq_mp_[i * ddcopq->sub_vector_ + j] = belong;
-                }
-                ddcopq->node_cluster_dist_[i] = dist_to_centroid;
-                ave_dist += dist_to_centroid;
-                if (i % 50000 == 0) std::cerr << "Encoder progress: " << i << " / " << data_list.size() << std::endl;
-            }
-            std::cerr << "Encoder ave dist:: " << ave_dist / data_list.size() << std::endl;
-        }
-
         for (int i = 0; i <curr_elements; ++i) {
             char *dataPoint = alg_hnsw->getDataByInternalId(i);
             alg_hnsw->dist_compare_operator_->query_transform((void *) dataPoint);

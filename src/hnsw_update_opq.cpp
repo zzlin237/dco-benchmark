@@ -2,18 +2,18 @@
 // Created by 郑荘霖 on 2025/7/27.
 //
 
-//#define _IP2L2_
+#define _OPQ_builder_
 #include <iostream>
 #include <getopt.h>
 #include <fstream>
 #include <ctime>
 #include <cmath>
 #include <queue>
-#include "../utils.h"
-#include "../Logger/Logger.h"
-#include "../FileIO/File_IO.h"
-#include "../FileIO/DataType.hpp"
-#include "../include/hnswlib/hnswlib.h"
+#include "../../utils.h"
+#include "../../Logger/Logger.h"
+#include "../../FileIO/File_IO.h"
+#include "../../FileIO/DataType.hpp"
+#include "../../include/hnswlib/hnswlib.h"
 
 using SearchKnnFuncPtr =
 std::priority_queue<std::pair<float, hnswlib::labeltype>>
@@ -21,7 +21,51 @@ std::priority_queue<std::pair<float, hnswlib::labeltype>>
 
 SearchKnnFuncPtr knn_ptr = nullptr;
 
+void save_pq_mp_binary(const std::string& filename, std::vector<uint8_t> &pq_mp_) {
+    std::ofstream out(filename, std::ios::binary);
+    size_t size = pq_mp_.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(reinterpret_cast<const char*>(pq_mp_.data()), size * sizeof(uint8_t));
+    out.close();
+}
+
+void load_pq_mp_binary(const std::string& filename, std::vector<uint8_t> &pq_mp_) {
+    std::ifstream in(filename, std::ios::binary);
+    size_t size;
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    pq_mp_.resize(size);
+    in.read(reinterpret_cast<char*>(pq_mp_.data()), size * sizeof(uint8_t));
+    in.close();
+}
+
+void save_node_cluster_dist_binary(const std::string& filename, std::vector<float> &node_cluster_dist_) {
+    std::ofstream out(filename, std::ios::binary);
+    size_t size = node_cluster_dist_.size();
+    out.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    out.write(reinterpret_cast<const char*>(node_cluster_dist_.data()), size * sizeof(float));
+    out.close();
+}
+
+void load_node_cluster_dist_binary(const std::string& filename, std::vector<float> &node_cluster_dist_) {
+    std::ifstream in(filename, std::ios::binary);
+    size_t size;
+    in.read(reinterpret_cast<char*>(&size), sizeof(size));
+    node_cluster_dist_.resize(size);
+    in.read(reinterpret_cast<char*>(node_cluster_dist_.data()), size * sizeof(float));
+    in.close();
+}
+
 int main(int argc, char *argv[]) {
+    //// parse arguments
+//    int K = 100;
+//    std::string dataset_path = "/home/zzlin/dataset/gist/train_600000/Qgist_base.fvecs";
+//    std::string query_path = "/home/zzlin/dataset/gist/query.fvecs";
+//    std::string ground_truth_path = "/home/zzlin/dataset/gist/gist_size700000_gt.ivecs";
+//    std::string index_path = "/home/zzlin/dataset/gist/train_600000/tmp_Qgist_M16_efConstruction500_operator0.index";
+//    int op = 7;
+//    int start_pos = 600000;
+//    int end_pos = 700000;
+
     //// parse arguments
     const struct option opts[] = {
             {"help",              no_argument,       0, 'h'},
@@ -147,14 +191,51 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    //    alg_hnsw->dist_compare_operator_.reset();
+//    alg_hnsw->dist_compare_operator_.reset();
     alg_hnsw->dist_compare_operator_ = setup_DCO(dataset_path, dim, op, msg);
     knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnn;
+
+    if (op == 7) {
+        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnOPQ;
+        DDCopq * ddcopq = dynamic_cast<DDCopq *>(alg_hnsw->dist_compare_operator_.get());
+        ddcopq->pq_mp_.resize(data_list.size() * ddcopq->sub_vector_);
+        ddcopq->node_cluster_dist_.resize(data_list.size());
+        double ave_dist = 0.0;
+            for (int i = 0; i < data_list.size(); i++) {
+                float dist_to_centroid = 0.0;
+                for (int j = 0; j < ddcopq->sub_vector_; j++) {
+                    uint8_t belong = 0;
+                    float dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
+                                                       ddcopq->pq_book_[j][0].data(),
+                                                       ddcopq->dist_func_param_sub_);
+                    for (int k = 1; k < ddcopq->sub_cluster_count_; k++) {
+                        float new_dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
+                                                               ddcopq->pq_book_[j][k].data(),
+                                                               ddcopq->dist_func_param_sub_);
+                        if (new_dist < dist) {
+                            belong = k;
+                            dist = new_dist;
+                        }
+                    }
+                    dist_to_centroid += dist;
+                    ddcopq->pq_mp_[i * ddcopq->sub_vector_ + j] = belong;
+                }
+                ddcopq->node_cluster_dist_[i] = dist_to_centroid;
+                ave_dist += dist_to_centroid;
+                if (i % 50000 == 0) std::cerr << "Encoder progress: " << i << " / " << data_list.size() << std::endl;
+            }
+            std::cerr << "Encoder ave dist:: " << ave_dist / data_list.size() << std::endl;
+//        save_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
+//        save_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
+//        load_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
+//        load_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
+    }
 
     Logger logger_update;
     logger_update.SetStartTimer();
     if (start_pos < end_pos) {
         for (int i = start_pos; i < end_pos; i++) {
+//            if ((i-start_pos) % 1000 == 0) std::cout << "update progress: " << i << " / " << end_pos << std::endl;
             alg_hnsw->addPoint(data_list[i].data.data(), data_list[i].vid);
         }
     } else if(start_pos > end_pos) {
@@ -191,14 +272,6 @@ int main(int argc, char *argv[]) {
         alg_hnsw->compute_base_square(false);
         logger.SetEndTimer();
         std::cout << "compute base square time: " << logger.GetDurationTime() << " [ms] " << std::endl;
-    }
-
-    if (op == 7) {
-        knn_ptr = &hnswlib::HierarchicalNSW<float>::searchKnnOPQ;
-        logger.SetStartTimer();
-        alg_hnsw->encoder_origin_data();
-        logger.SetEndTimer();
-        std::cout << "encoder origin data time: " << logger.GetDurationTime() << " [ms] " << std::endl;
     }
 
     HPLogger hp_logger;

@@ -57,90 +57,90 @@ void load_node_cluster_dist_binary(const std::string& filename, std::vector<floa
 
 int main(int argc, char *argv[]) {
     //// parse arguments
-    int K = 100;
-    std::string dataset_path = "/home/zzlin/dataset/gist/train_600000/Qgist_base.fvecs";
-    std::string query_path = "/home/zzlin/dataset/gist/query.fvecs";
-    std::string ground_truth_path = "/home/zzlin/dataset/gist/gist_size700000_gt.ivecs";
-    std::string index_path = "/home/zzlin/dataset/gist/train_600000/tmp_Qgist_M16_efConstruction500_operator0.index";
-    int op = 7;
-    int start_pos = 600000;
-    int end_pos = 700000;
+//    int K = 100;
+//    std::string dataset_path = "/home/zzlin/dataset/gist/train_600000/Qgist_base.fvecs";
+//    std::string query_path = "/home/zzlin/dataset/gist/query.fvecs";
+//    std::string ground_truth_path = "/home/zzlin/dataset/gist/gist_size700000_gt.ivecs";
+//    std::string index_path = "/home/zzlin/dataset/gist/train_600000/tmp_Qgist_M16_efConstruction500_operator0.index";
+//    int op = 7;
+//    int start_pos = 600000;
+//    int end_pos = 700000;
 
-//    //// parse arguments
-//    const struct option opts[] = {
-//            {"help",              no_argument,       0, 'h'},
-//            {"k",                 required_argument, 0, 'k'},
-//            {"dataset_path",      required_argument, 0, 'n'},
-//            {"query_path",        required_argument, 0, 'q'},
-//            {"ground_truth_path", required_argument, 0, 'g'},
-//            {"index_path",        required_argument, 0, 'i'},
-//            {"operator",          required_argument, 0, 'o'},
-//            {"start",             required_argument, 0, 's'},
-//            {"end   ",            required_argument, 0, 'e'},
-//    };
-//    int ind;
-//    int iarg = 0;
-//    opterr = 1;    //getopt error message (off: 0)
-//
-//    int K = 20;
-//    std::string dataset_path;
-//    std::string query_path;
-//    std::string ground_truth_path;
-//    std::string index_path;
-//    int op = 0;
-//    int start_pos = 0;
-//    int end_pos = 0;
-//
-//    while (iarg != -1) {
-//        iarg = getopt_long(argc, argv, "k:n:q:g:i:o:s:e:", opts, &ind);
-//        switch (iarg) {
-//            case 'k':
-//                if (optarg) K = atoi(optarg);
-//                break;
-//            case 'n':
-//                if (optarg) dataset_path = optarg;
-//                break;
-//            case 'q':
-//                if (optarg) query_path = optarg;
-//                break;
-//            case 'g':
-//                if (optarg) ground_truth_path = optarg;
-//                break;
-//            case 'i':
-//                if (optarg) index_path = optarg;
-//                break;
-//            case 'o':
-//                if (optarg) op = atoi(optarg);
-//                break;
-//            case 's':
-//                if (optarg) start_pos = atoi(optarg);
-//                break;
-//            case 'e':
-//                if (optarg) end_pos = atoi(optarg);
-//                break;
-//        }
-//    }
-//
-//    //// check arguments
-//    if (dataset_path.empty()) {
-//        std::cerr << "Error: dataset_path is empty. Please provide a valid path using the -n option." << std::endl;
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    if (query_path.empty()) {
-//        std::cerr << "Error: query_path is empty. Please provide a valid path using the -q option." << std::endl;
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    if (ground_truth_path.empty()) {
-//        std::cerr << "Error: ground_truth_path is empty. Please provide a valid path using the -g option." << std::endl;
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    if (index_path.empty()) {
-//        std::cerr << "Error: index_path is empty. Please provide a valid path using the -i option." << std::endl;
-//        exit(EXIT_FAILURE);
-//    }
+    //// parse arguments
+    const struct option opts[] = {
+            {"help",              no_argument,       0, 'h'},
+            {"k",                 required_argument, 0, 'k'},
+            {"dataset_path",      required_argument, 0, 'n'},
+            {"query_path",        required_argument, 0, 'q'},
+            {"ground_truth_path", required_argument, 0, 'g'},
+            {"index_path",        required_argument, 0, 'i'},
+            {"operator",          required_argument, 0, 'o'},
+            {"start",             required_argument, 0, 's'},
+            {"end   ",            required_argument, 0, 'e'},
+    };
+    int ind;
+    int iarg = 0;
+    opterr = 1;    //getopt error message (off: 0)
+
+    int K = 20;
+    std::string dataset_path;
+    std::string query_path;
+    std::string ground_truth_path;
+    std::string index_path;
+    int op = 0;
+    int start_pos = 0;
+    int end_pos = 0;
+
+    while (iarg != -1) {
+        iarg = getopt_long(argc, argv, "k:n:q:g:i:o:s:e:", opts, &ind);
+        switch (iarg) {
+            case 'k':
+                if (optarg) K = atoi(optarg);
+                break;
+            case 'n':
+                if (optarg) dataset_path = optarg;
+                break;
+            case 'q':
+                if (optarg) query_path = optarg;
+                break;
+            case 'g':
+                if (optarg) ground_truth_path = optarg;
+                break;
+            case 'i':
+                if (optarg) index_path = optarg;
+                break;
+            case 'o':
+                if (optarg) op = atoi(optarg);
+                break;
+            case 's':
+                if (optarg) start_pos = atoi(optarg);
+                break;
+            case 'e':
+                if (optarg) end_pos = atoi(optarg);
+                break;
+        }
+    }
+
+    //// check arguments
+    if (dataset_path.empty()) {
+        std::cerr << "Error: dataset_path is empty. Please provide a valid path using the -n option." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (query_path.empty()) {
+        std::cerr << "Error: query_path is empty. Please provide a valid path using the -q option." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (ground_truth_path.empty()) {
+        std::cerr << "Error: ground_truth_path is empty. Please provide a valid path using the -g option." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (index_path.empty()) {
+        std::cerr << "Error: index_path is empty. Please provide a valid path using the -i option." << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     std::cout << "K: " << K << std::endl;
     std::cout << "dataset_path: " << dataset_path << std::endl;
@@ -221,34 +221,34 @@ int main(int argc, char *argv[]) {
         ddcopq->pq_mp_.resize(data_list.size() * ddcopq->sub_vector_);
         ddcopq->node_cluster_dist_.resize(data_list.size());
         double ave_dist = 0.0;
-//            for (int i = 0; i < data_list.size(); i++) {
-//                float dist_to_centroid = 0.0;
-//                for (int j = 0; j < ddcopq->sub_vector_; j++) {
-//                    uint8_t belong = 0;
-//                    float dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
-//                                                       ddcopq->pq_book_[j][0].data(),
-//                                                       ddcopq->dist_func_param_sub_);
-//                    for (int k = 1; k < ddcopq->sub_cluster_count_; k++) {
-//                        float new_dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
-//                                                               ddcopq->pq_book_[j][k].data(),
-//                                                               ddcopq->dist_func_param_sub_);
-//                        if (new_dist < dist) {
-//                            belong = k;
-//                            dist = new_dist;
-//                        }
-//                    }
-//                    dist_to_centroid += dist;
-//                    ddcopq->pq_mp_[i * ddcopq->sub_vector_ + j] = belong;
-//                }
-//                ddcopq->node_cluster_dist_[i] = dist_to_centroid;
-//                ave_dist += dist_to_centroid;
-//                if (i % 50000 == 0) std::cerr << "Encoder progress: " << i << " / " << data_list.size() << std::endl;
-//            }
-//            std::cerr << "Encoder ave dist:: " << ave_dist / data_list.size() << std::endl;
-//            save_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
-//            save_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
-        load_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
-        load_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
+            for (int i = 0; i < data_list.size(); i++) {
+                float dist_to_centroid = 0.0;
+                for (int j = 0; j < ddcopq->sub_vector_; j++) {
+                    uint8_t belong = 0;
+                    float dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
+                                                       ddcopq->pq_book_[j][0].data(),
+                                                       ddcopq->dist_func_param_sub_);
+                    for (int k = 1; k < ddcopq->sub_cluster_count_; k++) {
+                        float new_dist = ddcopq->distfunc_sub_((float *) data_list[i].data.data() + j * ddcopq->sub_dim_,
+                                                               ddcopq->pq_book_[j][k].data(),
+                                                               ddcopq->dist_func_param_sub_);
+                        if (new_dist < dist) {
+                            belong = k;
+                            dist = new_dist;
+                        }
+                    }
+                    dist_to_centroid += dist;
+                    ddcopq->pq_mp_[i * ddcopq->sub_vector_ + j] = belong;
+                }
+                ddcopq->node_cluster_dist_[i] = dist_to_centroid;
+                ave_dist += dist_to_centroid;
+                if (i % 50000 == 0) std::cerr << "Encoder progress: " << i << " / " << data_list.size() << std::endl;
+            }
+            std::cerr << "Encoder ave dist:: " << ave_dist / data_list.size() << std::endl;
+//        save_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
+//        save_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
+//        load_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
+//        load_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
     }
 
     Logger logger_update;
