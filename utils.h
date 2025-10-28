@@ -36,13 +36,13 @@ std::unique_ptr<DCO> setup_DCO(const std::string& dataset, size_t dim, int op, s
 std::unique_ptr<DCO> setup_DCO(const std::string& dataset, size_t dim, int op, std::string type) {
     switch (op) {
         case 0:
-            std::cout << "Using FScanning" << std::endl;
+            std::cout << "Using FDScanning" << std::endl;
             return std::make_unique<FScanning>(dataset, dim);
         case 1:
-            std::cout << "Using PScanning" << std::endl;
+            std::cout << "Using PDScanning" << std::endl;
             return std::make_unique<PScanning>(dataset, dim);
         case 2:
-            std::cout << "Using RPScanning" << std::endl;
+            std::cout << "Using RPDScanning" << std::endl;
             return std::make_unique<RPScanning>(dataset, dim);
         case 3:
             std::cout << "Using ADSampling" << std::endl;
@@ -60,13 +60,13 @@ std::unique_ptr<DCO> setup_DCO(const std::string& dataset, size_t dim, int op, s
             std::cout << "Using DDCopq" << std::endl;
             return std::make_unique<DDCopq>(dataset, dim, type);
         case 8:
-            std::cout << "Using FScanningIP" << std::endl;
+            std::cout << "Using FDScanningIP" << std::endl;
             return std::make_unique<FScanningIP>(dataset, dim);
         case 9:
-            std::cout << "Using PScanningIP" << std::endl;
+            std::cout << "Using PDScanningIP" << std::endl;
             return std::make_unique<PScanningIP>(dataset, dim);
         case 10:
-            std::cout << "Using RPScanningIP" << std::endl;
+            std::cout << "Using RPDScanningIP" << std::endl;
             return std::make_unique<RPScanningIP>(dataset, dim);
         case 11:
             std::cout << "Using ADSamplingIP" << std::endl;
