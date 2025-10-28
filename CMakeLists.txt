@@ -26,17 +26,17 @@ add_library(hnswlib
         include/hnswlib/stop_condition.h
         include/hnswlib/visited_list_pool.h
         DCO/DCO.hpp
-        DCO/L2/FScanning.hpp
-        DCO/L2/PScanning.hpp
+        DCO/L2/FDScanning.hpp
+        DCO/L2/PDScanning.hpp
         DCO/L2/ADSampling.hpp
         DCO/L2/DADE.hpp
-        DCO/L2/RPScanning.hpp
+        DCO/L2/RPDScanning.hpp
         DCO/L2/DDCres.hpp
         DCO/L2/DDCpca.hpp
         DCO/L2/DDCopq.hpp
-        DCO/IP/FScanningIP.hpp
-        DCO/IP/PScanningIP.hpp
-        DCO/IP/RPScanningIP.hpp
+        DCO/IP/FDScanningIP.hpp
+        DCO/IP/PDScanningIP.hpp
+        DCO/IP/RPDScanningIP.hpp
         DCO/IP/ADSamplingIP.hpp
         DCO/IP/DADEIP.hpp
         DCO/IP/DDCresIP.hpp
