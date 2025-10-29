@@ -11,10 +11,10 @@ cd ../../build/src || exit
 
 for data in {0..1}; do
   for op in {0..7}; do
-    dataset_path="/home/zzlin/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
-    query_path="/home/zzlin/dataset/${datasets[$data]}/${query[$data]}"
-    ground_truth_path="/home/zzlin/dataset/${datasets[$data]}/gt_256.ivecs"
-    index_path="/home/zzlin/dataset/${datasets[$data]}/ivf_${rotate[$op]}${datasets[$data]}_C4096_operator0.index"
+    dataset_path="/home/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
+    query_path="/home/dataset/${datasets[$data]}/${query[$data]}"
+    ground_truth_path="/home/dataset/${datasets[$data]}/gt_256.ivecs"
+    index_path="/home/dataset/${datasets[$data]}/ivf_${rotate[$op]}${datasets[$data]}_C4096_operator0.index"
     log_file="${ORIGINAL_DIR}/ivf_search_no_simd/hnsw_${datasets[$data]}_K${K}_operator${op}_search_log.txt"
 
     ./ivf_search_no_simd -k "${K}" -n "${dataset_path}" -q "${query_path}" -g "${ground_truth_path}" -i "${index_path}" -o "${op}" >"${log_file}" 2>&1

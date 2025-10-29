@@ -17,12 +17,12 @@ cd ../../build/src || exit
 
 for op in {0..7}; do
   for end in ${ends[*]}; do
-    dataset_path="/home/zzlin/dataset/${dataset}/train_${size}/gist_base.fvecs"
-    index_path="/home/zzlin/dataset/${dataset}/train_${size}/hnsw_${dataset}_M16_efConstruction500_operator0.index"
-    query_path="/home/zzlin/dataset/${dataset}/query.fvecs"           #**
-    ground_truth_path="/home/zzlin/dataset/${dataset}/gist_size${end}_gt.ivecs"
+    dataset_path="/home/dataset/${dataset}/train_${size}/gist_base.fvecs"
+    index_path="/home/dataset/${dataset}/train_${size}/hnsw_${dataset}_M16_efConstruction500_operator0.index"
+    query_path="/home/dataset/${dataset}/query.fvecs"           #**
+    ground_truth_path="/home/dataset/${dataset}/gist_size${end}_gt.ivecs"
     if [ $end == 1000000 ]; then
-      ground_truth_path="/home/zzlin/dataset/${dataset}/gt_256.ivecs"
+      ground_truth_path="/home/dataset/${dataset}/gt_256.ivecs"
     fi
     log_file="${ORIGINAL_DIR}/log/hnsw_${rotate[${op}]}${dataset}_operator${op}_update_start${start}_end${end}_log.txt"
 

@@ -3,6 +3,8 @@
 //
 //#define _STATISTICS_
 //#define _FIX_DIMENSION_
+#define EIGEN_DONT_VECTORIZE
+#define EIGEN_DONT_PARALLELIZE
 
 #include <iostream>
 #include <getopt.h>

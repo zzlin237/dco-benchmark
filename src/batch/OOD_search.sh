@@ -14,10 +14,10 @@ cd ../../build/src || exit
 
 for data in {0..1}; do
   for op in {0..7}; do
-    dataset_path="/home/zzlin/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
-    query_path="/home/zzlin/dataset/${datasets[$data]}/${query1[$data]}"
-    ground_truth_path="/home/zzlin/dataset/${datasets[$data]}/${truth1[$data]}"
-    index_path="/home/zzlin/dataset/${datasets[$data]}/hnsw_${rotate[$op]}${datasets[$data]}_M16_efConstruction500_operator0.index"
+    dataset_path="/home/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
+    query_path="/home/dataset/${datasets[$data]}/${query1[$data]}"
+    ground_truth_path="/home/dataset/${datasets[$data]}/${truth1[$data]}"
+    index_path="/home/dataset/${datasets[$data]}/hnsw_${rotate[$op]}${datasets[$data]}_M16_efConstruction500_operator0.index"
     log_file="${ORIGINAL_DIR}/OOD/hnsw_${datasets[$data]}_K${K}_operator${op}_search_log_id.txt"
 
     ./hnsw_search -k "${K}" -n "${dataset_path}" -q "${query_path}" -g "${ground_truth_path}" -i "${index_path}" -o "${op}" >"${log_file}" 2>&1
@@ -31,10 +31,10 @@ done
 
 for data in {0..1}; do
   for op in {0..7}; do
-    dataset_path="/home/zzlin/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
-    query_path="/home/zzlin/dataset/${datasets[$data]}/${query2[$data]}"
-    ground_truth_path="/home/zzlin/dataset/${datasets[$data]}/${truth2[$data]}"
-    index_path="/home/zzlin/dataset/${datasets[$data]}/hnsw_${rotate[$op]}${datasets[$data]}_M16_efConstruction500_operator0.index"
+    dataset_path="/home/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
+    query_path="/home/dataset/${datasets[$data]}/${query2[$data]}"
+    ground_truth_path="/home/dataset/${datasets[$data]}/${truth2[$data]}"
+    index_path="/home/dataset/${datasets[$data]}/hnsw_${rotate[$op]}${datasets[$data]}_M16_efConstruction500_operator0.index"
     log_file="${ORIGINAL_DIR}/OOD/hnsw_${datasets[$data]}_K${K}_operator${op}_search_log_ood.txt"
 
     ./hnsw_search -k "${K}" -n "${dataset_path}" -q "${query_path}" -g "${ground_truth_path}" -i "${index_path}" -o "${op}" >"${log_file}" 2>&1

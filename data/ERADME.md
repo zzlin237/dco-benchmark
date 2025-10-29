@@ -14,8 +14,9 @@ numpy: 2.2.3
 * DDCres: `./data/ddc/batch_res.sh`
 * DDCpca:  `./data/ddc/batch_pca.sh`, after the index is established
 * DDCopq: `./data/ddc/batch_opq.sh`, after the index is established
+* Establish the corresponding index using the preprocessed data
 
-Note: The IP measurement method can be achieved by normalizing the dataset, except for DDCres, which can be used dirctly.
+Note: The IP measurement method can be achieved by normalizing the datasets, except for FDScanning and DDCres, which can be used dirctly.
 
 
 

@@ -26,16 +26,13 @@ make
 ## Dataset
 
 1. Download and preprocess the datasets. For details, please see `./data/README.md`
-2. Index the datasets. 
+2. Preprocess the datasets to obtain DCO operator. For details, please see `./data/README.md`
+3. Index the datasets. 
 
 ```sh
 ./Construction/script/hnsw_batch.sh
 ./Construction/script/ivf_batch.sh
 ```
-
-## DCO 
-
-* Preprocess the datasets to obtain DCO operator. For details, please see `./data/README.md`
 
 ## Test
 
@@ -46,7 +43,14 @@ make
 ./src/batch/ivf_seach.sh
 ./src/batch/hnsw_search_no_simd.sh
 ./src/batch/ivf_seach_no_simd.sh
+./src/batch/OOD_search.sh
+./src/batch/IP_search.sh
+./GPU/src/batch.sh
 ```
+
+2. Test the construction time using DCO operator.
+
+* Change `operator` in `./Construction/script/hnsw_batch.sh`
 
 
 

@@ -41,13 +41,13 @@ int main() {
     int k = 128;
 
     std::vector <VectorDataType> data_list;
-    ReadVectorData("/home/zzlin/dataset/gist/gist_base.fvecs", data_list);
+    ReadVectorData("/home/dataset/gist/gist_base.fvecs", data_list);
 
     std::vector <VectorDataType> query_data_list;
-    ReadVectorData("/home/zzlin/dataset/gist/query.fvecs", query_data_list);
+    ReadVectorData("/home/dataset/gist/query.fvecs", query_data_list);
 
     std::vector <std::vector<long>> ground_truth;
-    ReadGroundTruth("/home/zzlin/dataset/gist/gt_256.ivecs", ground_truth);
+    ReadGroundTruth("/home/dataset/gist/gt_256.ivecs", ground_truth);
 
     int m = data_list.size();
     int n = data_list[0].data.size();

@@ -58,10 +58,10 @@ void load_node_cluster_dist_binary(const std::string& filename, std::vector<floa
 int main(int argc, char *argv[]) {
     //// parse arguments
 //    int K = 100;
-//    std::string dataset_path = "/home/zzlin/dataset/gist/train_600000/Qgist_base.fvecs";
-//    std::string query_path = "/home/zzlin/dataset/gist/query.fvecs";
-//    std::string ground_truth_path = "/home/zzlin/dataset/gist/gist_size700000_gt.ivecs";
-//    std::string index_path = "/home/zzlin/dataset/gist/train_600000/tmp_Qgist_M16_efConstruction500_operator0.index";
+//    std::string dataset_path = "/home/dataset/gist/train_600000/Qgist_base.fvecs";
+//    std::string query_path = "/home/dataset/gist/query.fvecs";
+//    std::string ground_truth_path = "/home/dataset/gist/gist_size700000_gt.ivecs";
+//    std::string index_path = "/home/dataset/gist/train_600000/tmp_Qgist_M16_efConstruction500_operator0.index";
 //    int op = 7;
 //    int start_pos = 600000;
 //    int end_pos = 700000;
@@ -225,10 +225,10 @@ int main(int argc, char *argv[]) {
                 if (i % 50000 == 0) std::cerr << "Encoder progress: " << i << " / " << data_list.size() << std::endl;
             }
             std::cerr << "Encoder ave dist:: " << ave_dist / data_list.size() << std::endl;
-//        save_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
-//        save_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
-//        load_pq_mp_binary("/home/zzlin/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
-//        load_node_cluster_dist_binary("/home/zzlin/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
+//        save_pq_mp_binary("/home/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
+//        save_node_cluster_dist_binary("/home/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
+//        load_pq_mp_binary("/home/dataset/gist/train_600000/pq_mp.bin", ddcopq->pq_mp_);
+//        load_node_cluster_dist_binary("/home/dataset/gist/train_600000/node_cluster_dist.bin", ddcopq->node_cluster_dist_);
     }
 
     Logger logger_update;

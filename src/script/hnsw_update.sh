@@ -9,11 +9,11 @@ operator=6
 size=600000
 start=600000
 end=700000
-dataset_path="/home/zzlin/dataset/${dataset}/train_${size}/gist_base.fvecs"
-index_path="/home/zzlin/dataset/${dataset}/train_${size}/hnsw_${dataset}_M16_efConstruction500_operator0.index"
-query_path="/home/zzlin/dataset/${dataset}/query.fvecs"           #**
-ground_truth_path="/home/zzlin/dataset/${dataset}/gist_size${end}_gt.ivecs"
-#ground_truth_path="/home/zzlin/dataset/${dataset}/gt_256.ivecs"
+dataset_path="/home/dataset/${dataset}/train_${size}/gist_base.fvecs"
+index_path="/home/dataset/${dataset}/train_${size}/hnsw_${dataset}_M16_efConstruction500_operator0.index"
+query_path="/home/dataset/${dataset}/query.fvecs"           #**
+ground_truth_path="/home/dataset/${dataset}/gist_size${end}_gt.ivecs"
+#ground_truth_path="/home/dataset/${dataset}/gt_256.ivecs"
 log_file="${ORIGINAL_DIR}/update/hnsw_${rotation}${dataset}_operator${operator}_update_start${start}_end${end}_log.txt"
 
 ./hnsw_update -k ${K} -o ${operator} -n ${dataset_path} -q ${query_path} -g ${ground_truth_path} -s ${start} -e ${end} -i ${index_path} > ${log_file} 2>&1

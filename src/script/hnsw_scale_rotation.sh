@@ -5,11 +5,11 @@ cd ../../build/src || exit
 dataset="gist"                                                    #**
 rotation="L"
 size=10000
-dataset_path="/home/zzlin/dataset/${dataset}/train_${size}/${rotation}gist_base.fvecs"     #**
-query_path="/home/zzlin/dataset/${dataset}/query.fvecs"           #**
+dataset_path="/home/dataset/${dataset}/train_${size}/${rotation}gist_base.fvecs"     #**
+query_path="/home/dataset/${dataset}/query.fvecs"           #**
 operator=6                                                        #**
-index_path="/home/zzlin/dataset/${dataset}/hnsw_${dataset}_M16_efConstruction500_operator0.index"
-index_new_path="/home/zzlin/dataset/${dataset}/train_${size}/hnsw_${rotation}${dataset}_M16_efConstruction500_operator0.index"
+index_path="/home/dataset/${dataset}/hnsw_${dataset}_M16_efConstruction500_operator0.index"
+index_new_path="/home/dataset/${dataset}/train_${size}/hnsw_${rotation}${dataset}_M16_efConstruction500_operator0.index"
 ./hnsw_rotation -n ${dataset_path} -q ${query_path} -i ${index_path} -e ${index_new_path} -o ${operator}
 
 if [ $? -ne 0 ]; then

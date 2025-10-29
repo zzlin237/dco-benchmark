@@ -12,10 +12,10 @@ cd ../../build/src || exit
 for data in {0..4}; do
   for op in {0..6}; do
     for K in ${KNN[*]}; do
-      dataset_path="/home/zzlin/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
-      query_path="/home/zzlin/dataset/${datasets[$data]}/${query[$data]}"
-      ground_truth_path="/home/zzlin/dataset/${datasets[$data]}/gt_256.ivecs"
-      index_path="/home/zzlin/dataset/${datasets[$data]}/hnsw_${rotate[$op]}${datasets[$data]}_M16_efConstruction500_operator0.index"
+      dataset_path="/home/dataset/${datasets[$data]}/${rotate[$op]}${datasets[$data]}_base.fvecs"
+      query_path="/home/dataset/${datasets[$data]}/${query[$data]}"
+      ground_truth_path="/home/dataset/${datasets[$data]}/gt_256.ivecs"
+      index_path="/home/dataset/${datasets[$data]}/hnsw_${rotate[$op]}${datasets[$data]}_M16_efConstruction500_operator0.index"
       log_file="${ORIGINAL_DIR}/query_performance_no_simd/hnsw_${datasets[$data]}_K${K}_operator${op}_search_log.txt"
 
       ./hnsw_search_no_simd -k "${K}" -n "${dataset_path}" -q "${query_path}" -g "${ground_truth_path}" -i "${index_path}" -o "${op}" >"${log_file}" 2>&1

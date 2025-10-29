@@ -4,7 +4,7 @@
 #include <math.h>
 #include <iostream>
 #include <getopt.h>
-#include "ivf/ivf_cuda3.cuh"
+#include "ivf/ivf_cuda2.cuh"
 #include "../Logger/Logger.h"
 #include "../FileIO/File_IO.h"
 

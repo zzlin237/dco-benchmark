@@ -36,7 +36,7 @@ const float sigma = 8.0;
 
 /////////////////// Kernel ///////////////////
 
-__global__ void MatrixMulKernel(const float *d_matrix, float *d_query, float *d_result, size_t m) {
+__global__ void MatrixMulKernel(const float * __restrict__ d_matrix, float *d_query, float * __restrict__ d_result, size_t m) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx < m) {
@@ -48,7 +48,7 @@ __global__ void MatrixMulKernel(const float *d_matrix, float *d_query, float *d_
     }
 }
 
-__global__ void DistMapKernel(float *d_codebook, float *d_query, float *d_result, size_t sub_vector,
+__global__ void DistMapKernel(float *d_codebook, float *d_query, float * __restrict__ d_result, size_t sub_vector,
                               size_t sub_cluster_count, size_t sub_dim) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -68,7 +68,7 @@ __global__ void DistMapKernel(float *d_codebook, float *d_query, float *d_result
     }
 }
 
-__global__ void DistMap4ExtKernel(float *d_codebook, float *d_query, float *d_result, size_t sub_vector,
+__global__ void DistMap4ExtKernel(float *d_codebook, float *d_query, float * __restrict__ d_result, size_t sub_vector,
                                   size_t sub_cluster_count, size_t sub_dim) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -107,7 +107,7 @@ __global__ void DistMap4ExtKernel(float *d_codebook, float *d_query, float *d_re
  * @param n : number of rows
  * @param m : number of columns
  */
-__global__ void FDScanningKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m) {
+__global__ void FDScanningKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx < n) {
@@ -120,7 +120,7 @@ __global__ void FDScanningKernel(const float *d_matrix, const float *d_query, fl
     }
 }
 
-__global__ void FDScanning4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m) {
+__global__ void FDScanning4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx < n) {
@@ -153,7 +153,7 @@ __global__ void FDScanning4ExtKernel(const float *d_matrix, const float *d_query
  * @param threshold : threshold
  */
 __global__ void
-PDScanningKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m, float threshold) {
+PDScanningKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m, float threshold) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx < n) {
@@ -176,7 +176,7 @@ PDScanningKernel(const float *d_matrix, const float *d_query, float *d_result, s
 }
 
 __global__ void
-PDScanning4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+PDScanning4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                      float threshold) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -186,7 +186,7 @@ PDScanning4ExtKernel(const float *d_matrix, const float *d_query, float *d_resul
         const float4 *query_vec = reinterpret_cast<const float4 *>(d_query);
         size_t i = 0;
         while (i < m / 4) {
-            size_t check = delta_d / 4;
+            size_t check = (delta_d / 4 < m / 4 - i) ? delta_d / 4 : m / 4 - i;
             for (size_t j = 0; j < check; ++j) {
                 float4 m_val = matrix_vec[i + j];
                 float4 q_val = query_vec[i + j];
@@ -218,7 +218,7 @@ PDScanning4ExtKernel(const float *d_matrix, const float *d_query, float *d_resul
  * @param threshold : threshold
  */
 __global__ void
-ADSamplingKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m, float threshold) {
+ADSamplingKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m, float threshold) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx < n) {
@@ -231,6 +231,7 @@ ADSamplingKernel(const float *d_matrix, const float *d_query, float *d_result, s
                 sum_sq_diff += diff * diff;
             }
             i += check;
+            if (i == m) break;
             float sqrt_i = std::sqrt(static_cast<float>(i));
             float factor = (1.0f + epsilon0 / sqrt_i);
             if (sum_sq_diff >= threshold * i / m * factor * factor) {
@@ -242,7 +243,7 @@ ADSamplingKernel(const float *d_matrix, const float *d_query, float *d_result, s
     }
 }
 
-__global__ void ADSampling4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void ADSampling4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                                      float threshold) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -252,7 +253,7 @@ __global__ void ADSampling4ExtKernel(const float *d_matrix, const float *d_query
         const float4 *query_vec = reinterpret_cast<const float4 *>(d_query);
         size_t i = 0;
         while (i < m / 4) {
-            size_t check = delta_d / 4;
+            size_t check = (delta_d / 4 < m / 4 - i) ? delta_d / 4 : m / 4 - i;
             for (size_t j = 0; j < check; ++j) {
                 float4 m_val = matrix_vec[i + j];
                 float4 q_val = query_vec[i + j];
@@ -265,6 +266,7 @@ __global__ void ADSampling4ExtKernel(const float *d_matrix, const float *d_query
                 sum_sq_diff += diff1 * diff1 + diff2 * diff2 + diff3 * diff3 + diff4 * diff4;
             }
             i += check;
+            if (i == m / 4) break;
             float sqrt_i = std::sqrt(static_cast<float>(4 * i));
             float factor = (1.0f + epsilon0 / sqrt_i);
             if (sum_sq_diff >= threshold * 4 * i / m * factor * factor) {
@@ -285,7 +287,7 @@ __global__ void ADSampling4ExtKernel(const float *d_matrix, const float *d_query
  * @param m : number of columns
  * @param threshold : threshold
  */
-__global__ void DADEKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DADEKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                            float threshold, float *d_cdf_lmd, float *d_epsilon) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -299,6 +301,7 @@ __global__ void DADEKernel(const float *d_matrix, const float *d_query, float *d
                 sum_sq_diff += diff * diff;
             }
             i += check;
+            if (i == m) break;
             float factor = 1.0 + d_epsilon[i];
             if (sum_sq_diff >= threshold * d_cdf_lmd[i] / d_cdf_lmd[m] * factor * factor) {
                 sum_sq_diff = INF;
@@ -309,7 +312,7 @@ __global__ void DADEKernel(const float *d_matrix, const float *d_query, float *d
     }
 }
 
-__global__ void DADE4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DADE4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                                float threshold, float *d_cdf_lmd, float *d_epsilon) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -319,7 +322,7 @@ __global__ void DADE4ExtKernel(const float *d_matrix, const float *d_query, floa
         const float4 *query_vec = reinterpret_cast<const float4 *>(d_query);
         size_t i = 0;
         while (i < m / 4) {
-            size_t check = delta_d / 4;
+            size_t check = (delta_d / 4 < m / 4 - i) ? delta_d / 4 : m / 4 - i;
             for (size_t j = 0; j < check; ++j) {
                 float4 m_val = matrix_vec[i + j];
                 float4 q_val = query_vec[i + j];
@@ -332,6 +335,7 @@ __global__ void DADE4ExtKernel(const float *d_matrix, const float *d_query, floa
                 sum_sq_diff += diff1 * diff1 + diff2 * diff2 + diff3 * diff3 + diff4 * diff4;
             }
             i += check;
+            if (i == m / 4) break;
             float factor = 1.0 + d_epsilon[4 * i];
             if (sum_sq_diff >= threshold * d_cdf_lmd[4 * i] / d_cdf_lmd[m] * factor * factor) {
                 sum_sq_diff = INF;
@@ -351,7 +355,7 @@ __global__ void DADE4ExtKernel(const float *d_matrix, const float *d_query, floa
  * @param m : number of columns
  * @param threshold : threshold
  */
-__global__ void DDCresKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DDCresKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                              float threshold, float res, float *d_base_square, float *d_pre_query, size_t pos) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -373,7 +377,7 @@ __global__ void DDCresKernel(const float *d_matrix, const float *d_query, float 
     }
 }
 
-__global__ void DDCres4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DDCres4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                                  float threshold, float res, float *d_base_square, float *d_pre_query, size_t pos) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -383,7 +387,7 @@ __global__ void DDCres4ExtKernel(const float *d_matrix, const float *d_query, fl
         const float4 *query_vec = reinterpret_cast<const float4 *>(d_query);
         size_t i = 0;
         while (i < m / 4) {
-            size_t check = delta_d / 4;
+            size_t check = (delta_d / 4 < m / 4 - i) ? delta_d / 4 : m / 4 - i;
             for (size_t j = 0; j < check; ++j) {
                 float4 m_val = matrix_vec[i + j];
                 float4 q_val = query_vec[i + j];
@@ -415,7 +419,7 @@ __global__ void DDCres4ExtKernel(const float *d_matrix, const float *d_query, fl
  * @param threshold : threshold
  */
 __global__ void
-DDCpcaKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+DDCpcaKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
              float threshold, float *d_W, float *d_B) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -440,7 +444,7 @@ DDCpcaKernel(const float *d_matrix, const float *d_query, float *d_result, size_
     }
 }
 
-__global__ void DDCpca4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DDCpca4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                                  float threshold, float *d_W, float *d_B) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -451,7 +455,7 @@ __global__ void DDCpca4ExtKernel(const float *d_matrix, const float *d_query, fl
         const float4 *query_vec = reinterpret_cast<const float4 *>(d_query);
         size_t i = 0;
         while (i < m / 4) {
-            size_t check = delta_d / 4;
+            size_t check = (delta_d / 4 < m / 4 - i) ? delta_d / 4 : m / 4 - i;
             for (size_t j = 0; j < check; ++j) {
                 float4 m_val = matrix_vec[i + j];
                 float4 q_val = query_vec[i + j];
@@ -483,7 +487,7 @@ __global__ void DDCpca4ExtKernel(const float *d_matrix, const float *d_query, fl
  * @param m : number of columns
  * @param threshold : threshold
  */
-__global__ void DDCopqKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DDCopqKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                              float threshold, float *d_W, float *d_B, size_t sub_vector, size_t sub_cluster_count,
                              float *d_dist_mp, uint8_t *d_pq_mp, float *d_node_cluster_dist, size_t pos) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -506,7 +510,7 @@ __global__ void DDCopqKernel(const float *d_matrix, const float *d_query, float 
     }
 }
 
-__global__ void DDCopq4ExtKernel(const float *d_matrix, const float *d_query, float *d_result, size_t n, size_t m,
+__global__ void DDCopq4ExtKernel(const float * __restrict__ d_matrix, const float * __restrict__ d_query, float * __restrict__ d_result, size_t n, size_t m,
                                  float threshold, float *d_W, float *d_B, size_t sub_vector, size_t sub_cluster_count,
                                  float *d_dist_mp, uint8_t *d_pq_mp, float *d_node_cluster_dist, size_t pos) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -564,7 +568,7 @@ public:
     float *d_res_data_;
     float *d_centroids_;
     float *d_query_;
-    float *d_result_;
+    float * __restrict__ d_result_;
 
 
     //// dco
@@ -612,54 +616,54 @@ public:
 
 
     //// CUDA
-    void TransformCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t m);
+    void TransformCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t m);
 
-    void FDScanningCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void FDScanningCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold);
 
-    void FDScanning4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void FDScanning4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                             float threshold);
 
-    void PDScanningCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void PDScanningCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold);
 
-    void PDScanning4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void PDScanning4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                             float threshold);
 
-    void ADSamplingCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void ADSamplingCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold);
 
-    void ADSampling4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void ADSampling4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                             float threshold);
 
-    void DADECUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DADECUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                   float threshold);
 
-    void DADE4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DADE4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                       float threshold);
 
-    void DDCresCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DDCresCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                     float threshold);
 
-    void DDCres4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DDCres4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold);
 
-    void DDCpcaCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DDCpcaCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                     float threshold);
 
-    void DDCpca4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DDCpca4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold);
 
-    void DDCopqCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DDCopqCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                     float threshold);
 
-    void DDCopq4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DDCopq4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold);
 
-    void DistMapCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DistMapCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                      float threshold);
 
-    void DistMap4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+    void DistMap4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                          float threshold);
 
     //// function
@@ -678,7 +682,7 @@ public:
 
     void setPos(size_t pos);
 
-    void get_query_square(const float *q);
+    void get_query_square(const float * q);
 
     void compute_base_square(bool learned);
 
@@ -707,7 +711,7 @@ public:
 
 /////////////////// CUDA ///////////////////
 
-void IVF_CUDA::TransformCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t m) {
+void IVF_CUDA::TransformCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t m) {
     size_t threadsPerBlock = 256;
     size_t numBlocks = (m + threadsPerBlock - 1) / threadsPerBlock;
     MatrixMulKernel<<<numBlocks, threadsPerBlock>>>(d_matrix, d_query, d_result, m);
@@ -715,7 +719,7 @@ void IVF_CUDA::TransformCUDA(float *d_matrix, float *d_query, float *d_result, f
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) m * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::FDScanningCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::FDScanningCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                               float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -727,7 +731,7 @@ void IVF_CUDA::FDScanningCUDA(float *d_matrix, float *d_query, float *d_result, 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::FDScanning4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::FDScanning4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                                   float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -739,7 +743,7 @@ void IVF_CUDA::FDScanning4ExtCUDA(float *d_matrix, float *d_query, float *d_resu
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::PDScanningCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::PDScanningCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                               float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -751,7 +755,7 @@ void IVF_CUDA::PDScanningCUDA(float *d_matrix, float *d_query, float *d_result, 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::PDScanning4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::PDScanning4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                                   float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -763,7 +767,7 @@ void IVF_CUDA::PDScanning4ExtCUDA(float *d_matrix, float *d_query, float *d_resu
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::ADSamplingCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::ADSamplingCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                               float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -775,7 +779,7 @@ void IVF_CUDA::ADSamplingCUDA(float *d_matrix, float *d_query, float *d_result, 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::ADSampling4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::ADSampling4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                                   float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -787,7 +791,7 @@ void IVF_CUDA::ADSampling4ExtCUDA(float *d_matrix, float *d_query, float *d_resu
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DADECUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DADECUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                         float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -799,7 +803,7 @@ void IVF_CUDA::DADECUDA(float *d_matrix, float *d_query, float *d_result, float 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DADE4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DADE4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                             float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -812,7 +816,7 @@ void IVF_CUDA::DADE4ExtCUDA(float *d_matrix, float *d_query, float *d_result, fl
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DDCresCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DDCresCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                           float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -825,7 +829,7 @@ void IVF_CUDA::DDCresCUDA(float *d_matrix, float *d_query, float *d_result, floa
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DDCres4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DDCres4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                               float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -838,7 +842,7 @@ void IVF_CUDA::DDCres4ExtCUDA(float *d_matrix, float *d_query, float *d_result, 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DDCpcaCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DDCpcaCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                           float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -850,7 +854,7 @@ void IVF_CUDA::DDCpcaCUDA(float *d_matrix, float *d_query, float *d_result, floa
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DDCpca4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DDCpca4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                               float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -862,7 +866,7 @@ void IVF_CUDA::DDCpca4ExtCUDA(float *d_matrix, float *d_query, float *d_result, 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DDCopqCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DDCopqCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                           float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -875,7 +879,7 @@ void IVF_CUDA::DDCopqCUDA(float *d_matrix, float *d_query, float *d_result, floa
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DDCopq4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DDCopq4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                               float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -890,7 +894,7 @@ void IVF_CUDA::DDCopq4ExtCUDA(float *d_matrix, float *d_query, float *d_result, 
     CUDA_CHECK(cudaMemcpy(h_result, d_result, (size_t) n * sizeof(float), cudaMemcpyDeviceToHost));
 }
 
-void IVF_CUDA::DistMapCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DistMapCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                            float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -901,7 +905,7 @@ void IVF_CUDA::DistMapCUDA(float *d_matrix, float *d_query, float *d_result, flo
     CUDA_CHECK(cudaDeviceSynchronize());
 }
 
-void IVF_CUDA::DistMap4ExtCUDA(float *d_matrix, float *d_query, float *d_result, float *h_result, size_t n, size_t m,
+void IVF_CUDA::DistMap4ExtCUDA(float *d_matrix, float *d_query, float * __restrict__ d_result, float *h_result, size_t n, size_t m,
                                float threshold) {
     // Launch kernel
     size_t threadsPerBlock = 256;
@@ -1038,7 +1042,7 @@ void IVF_CUDA::setPos(size_t pos) {
     this->pos_ = pos;
 }
 
-void IVF_CUDA::get_query_square(const float *q) {
+void IVF_CUDA::get_query_square(const float * q) {
     pre_query_ = new float[D_ + 1];
     query_square_ = 0;
     for (int i = 0; i < D_; i++) {
