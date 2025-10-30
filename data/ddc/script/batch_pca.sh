@@ -2,9 +2,9 @@
 
 ORIGINAL_DIR=$(pwd)
 
-datasets=("deep1b" "glove100" "sift" "gist" "OpenAIArXiv" "trevi")
+datasets=("glove100" "sift" "gist" "OpenAIArXiv" "trevi")
 
-for data in {0..6}; do
+for data in {0..4}; do
   cd ../../../build/data/ddc || exit
   K=100
   recall=0.995

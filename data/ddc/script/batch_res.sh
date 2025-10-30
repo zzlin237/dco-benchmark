@@ -2,8 +2,8 @@
 
 ORIGINAL_DIR=$(pwd)
 
-datasets=("deep1b" "glove100" "sift" "gist" "OpenAIArXiv" "trevi")
-base=("base.1B.fbin.crop_nb_100000000" "glove100.bin" "sift_base.fvecs" "gist_base.fvecs" "openai_base.bin" "trevi_base.fvecs")
+datasets=("glove100" "sift" "gist" "OpenAIArXiv" "trevi")
+base=("glove100.bin" "sift_base.fvecs" "gist_base.fvecs" "openai_base.bin" "trevi_base.fvecs")
 
 cd ../../build/src || exit
 

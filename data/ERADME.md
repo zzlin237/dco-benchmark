@@ -6,6 +6,7 @@ numpy: 2.2.3
 ```
 
 ## Datesets
+The tested datasets are available at [Google Drive](https://drive.google.com/drive/u/1/folders/1IDlNI7EO-xK70NaDizrUD7pQqokOAkwx).
 
 ## DCO
 
@@ -16,7 +17,7 @@ numpy: 2.2.3
 * DDCopq: `./data/ddc/batch_opq.sh`, after the index is established
 * Establish the corresponding index using the preprocessed data
 
-Note: The IP measurement method can be achieved by normalizing the datasets, except for FDScanning and DDCres, which can be used dirctly.
+Note: The IP measurement method can be achieved by normalizing the datasets (`./src/script/hnsw_normalize.sh`), except for FDScanning and DDCres, which can be used dirctly.
 
 
 

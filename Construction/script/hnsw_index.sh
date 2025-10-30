@@ -2,12 +2,12 @@
 
 ORIGINAL_DIR=$(pwd)
 cd ../../build/Construction
-dataset="deep1b"
+dataset="gist"
 rotation="O"
 M=16
 efConstruction=500
 operator=3
-dataset_path="/home/zzlin/dataset/${dataset}/${rotation}deep1b_base.fvecs"
+dataset_path="/home/zzlin/dataset/${dataset}/${rotation}gist_base.fvecs"
 index_path="/home/zzlin/dataset/${dataset}/hnsw_${rotation}${dataset}_M${M}_efConstruction${efConstruction}_operator${operator}.index"
 log_file="${ORIGINAL_DIR}/log/hnsw_${rotation}${dataset}_M${M}_efConstruction${efConstruction}_operator${operator}_log.txt"
 

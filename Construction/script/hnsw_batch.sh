@@ -3,8 +3,8 @@
 ORIGINAL_DIR=$(pwd)
 cd ../../build/Construction || exit 1
 
-datasets=("deep1b" "glove100" "sift" "gist" "OpenAIArXiv" "trevi" "text2image" "laion")
-base=("base.1B.fbin.crop_nb_100000000" "glove100.bin" "sift_base.fvecs" "gist_base.fvecs" "openai_base.bin" "trevi_base.fvecs" "base.1B.fbin.crop_nb_10000000" "img_dataset.bin")
+datasets=("glove100" "sift" "gist" "OpenAIArXiv" "trevi" "text2image" "laion")
+base=("glove100.bin" "sift_base.fvecs" "gist_base.fvecs" "openai_base.bin" "trevi_base.fvecs" "base.1B.fbin.crop_nb_10000000" "img_dataset.bin")
 rotation=""
 #rotate=("" "" "P" "O" "P" "L" "L" "Q") FDScanning, PDScanning, PDScanning+, ADSampling, DADE, DDCres, DDCpca, DDCopq
 
