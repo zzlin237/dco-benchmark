@@ -1,6 +1,6 @@
-#Distance Comparison Operations Are Not Silver Bullets in Vector Similarity Search: A Benchmark Study on Their Merits and Limits
+##Distance Comparison Operations Are Not Silver Bullets in Vector Similarity Search: A Benchmark Study on Their Merits and Limits
 
-## Environment
+### Environment
 
 OS: Ubuntu 24.04.2 LTS
 
@@ -12,7 +12,7 @@ Python: >= 3.10.16
 
 Eigen: >= 3.4.0
 
-## Compile and run our algorithms
+### Compile and run our algorithms
 
 Execute the following commands to compile relevant code.
 
@@ -23,7 +23,7 @@ cmake ..
 make
 ```
 
-## Dataset
+### Dataset
 
 1. Download and preprocess the datasets. For details, please see `./data/README.md`
 2. Preprocess the datasets to obtain DCO operator. For details, please see `./data/README.md`
@@ -34,7 +34,7 @@ make
 ./Construction/script/ivf_batch.sh
 ```
 
-## Test
+### Test
 
 1. Test the queries of the datasets. 
 
