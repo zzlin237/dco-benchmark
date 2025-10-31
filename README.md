@@ -1,8 +1,41 @@
-
-
 #Distance Comparison Operations Are Not Silver Bullets in Vector Similarity Search: A Benchmark Study on Their Merits and Limits
 
+## Abstract
+
+Distance Comparison Operations (DCOs), which determine whether the distance between a data vector and a query is within a given threshold, are a critical performance bottleneck in vector similarity search. 
+Recent DCO methods that avoid full-dimensional distance computations promise significant speedups, but their readiness for production vector database systems remains an open question.
+To address this, we conduct a comprehensive benchmark of 8 DCO algorithms across 10 datasets (with up to 100M vectors and 12,288 dimensions) and diverse hardware configurations (CPUs with/without SIMD, and GPUs).
+Our study reveals that these methods are not silver bullets: their efficiency is highly sensitive to data dimensionality, degrades under out-of-distribution queries, and is unstable across hardware.
+Yet, our evaluation also demonstrates often-overlooked merits: they can accelerate index construction and data updates.
+Despite these benefits, their unstable performance, which can be slower than a full-dimensional scan, leads us to conclude that no current DCO method is ready for production deployment. 
+
+## Fullpaper
+
 The full version of our paper can be obtained in `fullpaper.pdf`
+
+## Dataset
+
+1. Download and preprocess the datasets. The tested datasets are available at [Google Drive](https://drive.google.com/drive/u/1/folders/1IDlNI7EO-xK70NaDizrUD7pQqokOAkwx).
+
+2. Preprocess the datasets to obtain DCO operator. 
+
+   ```
+   * ADSampling: `./data/adsampling/batch.sh`
+   * DADE: `./data/dade/batch.sh`
+   * DDCres: `./data/ddc/batch_res.sh`
+   * DDCpca:  `./data/ddc/batch_pca.sh`, after the index is established
+   * DDCopq: `./data/ddc/batch_opq.sh`, after the index is established
+   * Establish the corresponding index using the preprocessed data
+   ```
+
+   Note: The IP measurement method can be achieved by normalizing the datasets (`./src/script/hnsw_normalize.sh`), except for FDScanning and DDCres, which can be used dirctly.
+
+3. Index the datasets. 
+
+```sh
+./Construction/script/hnsw_batch.sh
+./Construction/script/ivf_batch.sh
+```
 
 ## Environment
 
@@ -25,17 +58,6 @@ mkdir build
 cd build
 cmake ..
 make
-```
-
-## Dataset
-
-1. Download and preprocess the datasets. For details, please see `./data/README.md`
-2. Preprocess the datasets to obtain DCO operator. For details, please see `./data/README.md`
-3. Index the datasets. 
-
-```sh
-./Construction/script/hnsw_batch.sh
-./Construction/script/ivf_batch.sh
 ```
 
 ## Test
