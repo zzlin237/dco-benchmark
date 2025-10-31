@@ -1,5 +1,4 @@
 import numpy as np
-# from sklearn.decomposition import PCA  <- This is no longer needed
 from utils import read_vector_file, fvecs_write, ivecs_read
 import os
 import argparse

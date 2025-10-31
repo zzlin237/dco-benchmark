@@ -15,7 +15,7 @@ The full version of our paper can be obtained in `fullpaper.pdf`
 
 ## Dataset
 
-1. Download and preprocess the datasets. The tested datasets are available at [Google Drive](https://drive.google.com/drive/u/1/folders/1IDlNI7EO-xK70NaDizrUD7pQqokOAkwx).
+1. Download and preprocess the datasets. The tested datasets are available at https://pan.baidu.com/s/59NArzpIVuE3X4NsdK5u6Jg.
 
 2. Preprocess the datasets to obtain DCO operator. 
 
@@ -51,7 +51,7 @@ Eigen: >= 3.4.0
 
 ## Compile and run our algorithms
 
-Execute the following commands to compile relevant code.
+1. Execute the following commands to compile relevant code.
 
 ```sh
 mkdir build
@@ -60,9 +60,7 @@ cmake ..
 make
 ```
 
-## Test
-
-1. Test the queries of the datasets. 
+2. Test the queries of the datasets. 
 
 ```sh
 ./src/batch/hnsw_search.sh
@@ -74,9 +72,22 @@ make
 ./GPU/src/batch.sh
 ```
 
-2. Test the construction time using DCO operator.
+3. Test the construction time using DCO operator.
 
 * Change `operator` in `./Construction/script/hnsw_batch.sh`
+
+4. Introduction to our DCOs
+
+| DCO     | Experimental number | Dataset preprocessing |
+| ----------- | -------- |-----------------------|
+| FDScanning  | 0        | data_base.fvecs       |
+| PDScanning  | 1        | data_base.fvecs       |
+| PDScanning+ | 2        | Pdata_base.fvecs      |
+| ADSampling  | 3        | Odata_base.fvecs      |
+| DADE        | 4        | Pdata_base.fvecs      |
+| DDCres      | 5        | Ldata_base.fvecs      |
+| DDCpca      | 6        | Ldata_base.fvecs      |
+| DDCopq      | 7        | Qdata_base.fvecs      |
 
 
 
