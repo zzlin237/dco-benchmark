@@ -1,3 +1,5 @@
+
+
 #Distance Comparison Operations Are Not Silver Bullets in Vector Similarity Search: A Benchmark Study on Their Merits and Limits
 
 The full version of our paper can be obtained in `fullpaper.pdf`
