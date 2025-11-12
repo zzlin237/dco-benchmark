@@ -147,6 +147,7 @@ public:
     float *sse4_dist_scan(const int *id, size_t num) {
         if (num > res_.size()) res_.resize(num + 1);
         auto res = res_.data();
+#ifdef USE_SSE
         float arr[4];
         for (int i = 0; i < num; i += 4) {
             __m128 candidate_dist;
@@ -158,6 +159,7 @@ public:
             _mm_store_ps(arr, candidate_dist);
             std::memcpy(res + i, arr, 16);
         }
+#endif
         return res;
     }
 

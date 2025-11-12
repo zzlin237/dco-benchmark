@@ -10,7 +10,7 @@
 
 #ifndef NO_MANUAL_VECTORIZATION
 #if (defined(__SSE__) || _M_IX86_FP > 0 || defined(_M_AMD64) || defined(_M_X64))
-#define USE_SSE
+#define USE_SSE     // comment when simd is disabled
 #ifdef __AVX__
 #define USE_AVX
 #ifdef __AVX512F__
